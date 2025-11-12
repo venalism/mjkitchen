@@ -1,29 +1,37 @@
-const jwt = require('jsonwebtoken');
+// server/middleware/auth.js
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
-// Validate Supabase JWT (or any HS256 JWT) using SUPABASE_JWT_SECRET
+// Create a Supabase Admin client
+// It uses the SERVICE_ROLE_KEY to verify tokens
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 const auth = async (req, res, next) => {
   try {
-    const authHeader = req.header('Authorization') || '';
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
     if (!token) {
-      return res.status(401).json({ message: 'Tidak ada token autentikasi' });
+      return res.status(401).json({ message: 'No authentication token' });
     }
 
-    const secret = process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET;
-    const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] });
+    // Ask Supabase to verify the token
+    const { data: { user }, error } = await supabase.auth.getUser(token);
 
-    // Normalize common Supabase claims
-    req.user = {
-      sub: decoded.sub,
-      email: decoded.email,
-      role: decoded.role || decoded.user_role,
-      user_id: decoded.user_id || decoded.sub, // fallback
-    };
+    if (error || !user) {
+      console.error('Supabase auth error:', error?.message);
+      return res.status(401).json({ message: 'Invalid token' });
+    }
 
+    // Token is valid! Attach user info to the request
+    req.user = user; 
+    // You can now access req.user.id, req.user.email etc. in your protected routes
+    
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Token tidak valid', detail: error.message });
+    res.status(401).json({ message: 'Invalid token' });
   }
 };
 

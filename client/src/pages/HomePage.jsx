@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiTruck, FiStar } from 'react-icons/fi'; // Modern icons
+import { FiTruck, FiFeather, FiStar } from 'react-icons/fi';
 
 export default function HomePage() {
   return (
@@ -47,7 +47,7 @@ export default function HomePage() {
       <section className="py-12">
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <FiLeaf size={40} className="text-emerald-600 mb-4 mx-auto" />
+            <FiFeather size={40} className="text-emerald-600 mb-4 mx-auto" />
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Fresh Ingredients</h3>
             <p className="text-gray-500">
               We source only the best local and seasonal ingredients for our dishes.

@@ -11,7 +11,7 @@ exports.getMe = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const email = req.user?.email; // from auth middleware
+    const email = req.profile?.email; // from auth middleware
     const { name, phone_number } = req.body;
     
     const { rows } = await pool.query(

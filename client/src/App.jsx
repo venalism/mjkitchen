@@ -39,7 +39,7 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (profile?.role_name !== 'admin') {
+  if (profile?.role !== 'admin') {
     // Logged in, but NOT an admin
     return <Navigate to="/" replace />;
   }

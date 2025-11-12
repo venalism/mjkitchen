@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiAlertCircle, FiLogIn } from 'react-icons/fi';
 // import { FaGoogle } from 'react-icons/fa'; // Not using Google for now
-import { supabase /*, signInWithGoogle*/ } from '../services/supabase'; // ✨ ADDED THIS IMPORT
+import { supabase } from '../services/supabase';
 
 function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();

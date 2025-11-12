@@ -1,7 +1,7 @@
 // server/middleware/adminOnly.js
 const adminOnly = (req, res, next) => {
   // Requires auth middleware first
-  const role = req.profile?.role_name;
+  const role = req.profile?.role;
 
   if (role && role.toLowerCase() === 'admin') {
     return next();

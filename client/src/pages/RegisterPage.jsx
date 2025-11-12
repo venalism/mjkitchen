@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiAlertCircle, FiUserPlus } from 'react-icons/fi';
-import { FaGoogle } from 'react-icons/fa';
+// import { FaGoogle } from 'react-icons/fa'; // Not using Google for now
+import { supabase /*, signInWithGoogle*/ } from '../services/supabase'; // ✨ ADDED THIS IMPORT
 
 function RegisterPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -15,12 +16,11 @@ function RegisterPage() {
     setLoading(true);
     setAuthError(null);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // This line will now work
+      const { data, error } = await supabase.auth.signUp({ 
         email: formData.email,
         password: formData.password,
         options: {
-          // Pass extra details to be stored in `auth.users`
-          // This will be picked up by your SQL trigger
           data: {
             name: formData.name,
             phone_number: formData.phone_number,
@@ -40,6 +40,7 @@ function RegisterPage() {
     }
   };
 
+  /* // Commenting out Google login since it's not configured
   const handleGoogleLogin = async () => {
     setLoading(true);
     setAuthError(null);
@@ -50,6 +51,7 @@ function RegisterPage() {
       setLoading(false);
     }
   };
+  */
 
   return (
     <div className="flex items-center justify-center py-12">
@@ -76,8 +78,9 @@ function RegisterPage() {
           </div>
         </div>
 
-        {/* Email Form */}
+        {/* Email Form (content is the same...) */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* ... all your form fields ... */}
           <div>
             <label 
               htmlFor="name" 

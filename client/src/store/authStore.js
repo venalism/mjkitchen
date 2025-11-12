@@ -1,6 +1,6 @@
 // client/src/store/authStore.js
 import { create } from 'zustand';
-import { supabase, signOut } from '../services/supabaseAuth';
+import { supabase, signOut } from '../services/supabase';
 import api from '../services/api';
 
 export const useAuthStore = create((set, get) => ({

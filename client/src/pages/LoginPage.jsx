@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiAlertCircle, FiLogIn } from 'react-icons/fi';
-import { FaGoogle } from 'react-icons/fa'; // Use a standard Google icon
+// import { FaGoogle } from 'react-icons/fa'; // Not using Google for now
+import { supabase /*, signInWithGoogle*/ } from '../services/supabase'; // ✨ ADDED THIS IMPORT
 
 function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -15,6 +16,7 @@ function LoginPage() {
     setLoading(true);
     setAuthError(null);
     try {
+      // This line will now work
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
@@ -22,7 +24,6 @@ function LoginPage() {
 
       if (error) throw error;
       
-      // Login is successful, redirect to the menu
       navigate('/menu');
 
     } catch (error) {
@@ -32,17 +33,18 @@ function LoginPage() {
     }
   };
 
+  /* // Commenting out Google login since it's not configured
   const handleGoogleLogin = async () => {
     setLoading(true);
     setAuthError(null);
     try {
       await signInWithGoogle();
-      // Supabase handles the redirect
     } catch (error) {
       setAuthError(error.message);
       setLoading(false);
     }
   };
+  */
 
   return (
     <div className="flex items-center justify-center py-12">
@@ -69,8 +71,9 @@ function LoginPage() {
           </div>
         </div>
         
-        {/* Email Form */}
+        {/* Email Form (content is the same...) */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* ... all your form fields ... */}
           <div>
             <label 
               htmlFor="email" 

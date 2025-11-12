@@ -19,6 +19,35 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
+//  NEW ADMIN ROUTE COMPONENT
+const AdminRoute = ({ children }) => {
+  const token = useAuthStore((s) => s.token);
+  const profile = useAuthStore((s) => s.profile);
+  const loading = useAuthStore((s) => s.loading);
+
+  if (loading) {
+    // Wait until profile is fetched
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!token) {
+    // Not logged in
+    return <Navigate to="/login" replace />;
+  }
+
+  if (profile?.role_name !== 'admin') {
+    // Logged in, but NOT an admin
+    return <Navigate to="/" replace />;
+  }
+
+  // Logged in AND is an admin
+  return children;
+};
+
 function App() {
   const init = useAuthStore((s) => s.init);
   useEffect(() => {
@@ -37,7 +66,8 @@ function App() {
           <Route path="/orders" element={<PrivateRoute><OrderTrackingPage /></PrivateRoute>} />
         </Route>
 
-        <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
+        {/* ✨ UPDATED: Use AdminRoute to protect this whole section */}
+        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="menu" element={<AdminMenuPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />

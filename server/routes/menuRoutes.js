@@ -2,36 +2,23 @@
 const express = require('express');
 const router = express.Router();
 const menuController = require('../controllers/menuController');
-const auth = require('../middleware/auth'); // Our auth middleware
+const auth = require('../middleware/auth');
+const adminOnly = require('../middleware/adminOnly'); // Admin middleware
 
 // --- Public Routes ---
-
-// GET /api/menu/categories
 router.get('/categories', menuController.getCategories);
-
-// GET /api/menu/items
 router.get('/items', menuController.getMenu);
-
-// GET /api/menu/items/:id
 router.get('/items/:id', menuController.getMenuById);
 
-
 // --- Protected (Admin) Routes ---
-// These routes require a valid token.
-// We can add admin-specific role checks later if needed.
 
-// POST /api/menu/items
-router.post('/items', auth, menuController.createMenu);
+// We chain the middleware: first check for login (auth), then check for admin (adminOnly)
+router.post('/items', [auth, adminOnly], menuController.createMenu);
+router.put('/items/:id', [auth, adminOnly], menuController.updateMenu);
+router.delete('/items/:id', [auth, adminOnly], menuController.deleteMenu);
 
-// PUT /api/menu/items/:id
-router.put('/items/:id', auth, menuController.updateMenu);
-
-// DELETE /api/menu/items/:id
-router.delete('/items/:id', auth, menuController.deleteMenu);
-
-// Category admin routes
-router.post('/categories', auth, menuController.createCategory);
-router.put('/categories/:id', auth, menuController.updateCategory);
-router.delete('/categories/:id', auth, menuController.deleteCategory);
+router.post('/categories', [auth, adminOnly], menuController.createCategory);
+router.put('/categories/:id', [auth, adminOnly], menuController.updateCategory);
+router.delete('/categories/:id', [auth, adminOnly], menuController.deleteCategory);
 
 module.exports = router;

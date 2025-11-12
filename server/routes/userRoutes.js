@@ -7,9 +7,6 @@ const auth = require('../middleware/auth'); // Our auth middleware
 // All user routes are protected
 router.use(auth);
 
-// POST /api/users/bootstrap (Syncs Supabase auth user with our DB)
-router.post('/bootstrap', userController.bootstrapProfile);
-
 // GET /api/users/me (Get current user's profile)
 router.get('/me', userController.getMe);
 

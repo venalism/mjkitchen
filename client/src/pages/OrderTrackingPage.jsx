@@ -1,3 +1,4 @@
+// client/src/pages/OrderTrackingPage.jsx
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
@@ -7,8 +8,9 @@ export default function OrderTrackingPage() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    if (profile?.user_id) {
-      api.get(`/orders/mine/${profile.user_id}`).then((r) => setOrders(r.data));
+    // ✨ FIX: Use profile.id instead of profile.user_id
+    if (profile?.id) {
+      api.get(`/orders/mine/${profile.id}`).then((r) => setOrders(r.data));
     }
   }, [profile]);
 
@@ -30,4 +32,3 @@ export default function OrderTrackingPage() {
     </div>
   );
 }
-

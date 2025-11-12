@@ -1,3 +1,4 @@
+// client/src/pages/CartPage.jsx
 import React from 'react';
 import { useCartStore } from '../store/cartStore';
 import api from '../services/api';
@@ -11,13 +12,19 @@ export default function CartPage() {
 
   const placeOrder = async () => {
     if (!profile) return alert('Harap login');
-    // For demo, gunakan alamat default pertama
-    const addrs = await api.get(`/users/${profile.user_id}/addresses`);
+    
+    // Use profile.id instead of profile.user_id
+    const addrs = await api.get(`/users/${profile.id}/addresses`);
     const defaultAddress = addrs.data[0];
-    if (!defaultAddress) return alert('Tambahkan alamat terlebih dahulu');
+    
+    if (!defaultAddress) {
+      // Your SQL requires a city, let's warn the user
+      return alert('Tambahkan alamat (termasuk Kota) terlebih dahulu');
+    }
 
     const payload = {
-      user_id: profile.user_id,
+      // Use profile.id instead of profile.user_id
+      user_id: profile.id, 
       address_id: defaultAddress.address_id,
       items: items.map((i) => ({ menu_id: i.menu_id, quantity: i.quantity })),
     };
@@ -52,4 +59,3 @@ export default function CartPage() {
     </div>
   );
 }
-

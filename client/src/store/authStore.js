@@ -1,3 +1,4 @@
+// client/src/store/authStore.js
 import { create } from 'zustand';
 import { supabase, signOut } from '../services/supabaseAuth';
 import api from '../services/api';
@@ -6,48 +7,55 @@ export const useAuthStore = create((set, get) => ({
   user: null,
   token: null,
   profile: null,
-  loading: false,
+  loading: true,
 
   init: async () => {
-    const { data } = await supabase.auth.getSession();
-    const session = data?.session;
-    if (session?.access_token) {
-      set({ user: session.user, token: session.access_token });
-      localStorage.setItem('token', session.access_token);
-      // bootstrap profile on backend
-      try {
-        const resp = await api.post('/users/bootstrap', {
-          name: session.user?.user_metadata?.full_name || session.user?.email,
-          email: session.user?.email,
-        });
+    set({ loading: true });
+    try {
+      const { data } = await supabase.auth.getSession();
+      const session = data?.session;
+      if (session?.access_token) {
+        set({ user: session.user, token: session.access_token });
+        localStorage.setItem('token', session.access_token);
+        
+        // ✨ UPDATED: Fetch the profile instead of bootstrapping
+        const resp = await api.get('/users/me');
         set({ profile: resp.data });
-      } catch {}
+        
+      }
+    } catch (e) {
+      console.error('Error in auth init:', e);
+    } finally {
+      set({ loading: false });
     }
   },
 
   setSession: async (session) => {
-    const token = session?.access_token || null;
-    set({ user: session?.user || null, token });
-    if (token) {
-      localStorage.setItem('token', token);
-      try {
-        const resp = await api.post('/users/bootstrap', {
-          name: session.user?.user_metadata?.full_name || session.user?.email,
-          email: session.user?.email,
-        });
+    set({ loading: true });
+    try {
+      const token = session?.access_token || null;
+      set({ user: session?.user || null, token });
+      if (token) {
+        localStorage.setItem('token', token);
+        
+        // ✨ UPDATED: Fetch the profile instead of bootstrapping
+        const resp = await api.get('/users/me');
         set({ profile: resp.data });
-      } catch {}
-    } else {
-      localStorage.removeItem('token');
-      set({ profile: null });
+
+      } else {
+        localStorage.removeItem('token');
+        set({ profile: null });
+      }
+    } catch (e) {
+      console.error('Error in setSession:', e);
+    } finally {
+      set({ loading: false });
     }
   },
 
   logout: async () => {
     await signOut();
     localStorage.removeItem('token');
-    set({ user: null, token: null, profile: null });
+    set({ user: null, token: null, profile: null, loading: false });
   },
 }));
-
-

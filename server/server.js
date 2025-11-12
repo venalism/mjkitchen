@@ -1,3 +1,4 @@
+// server/server.js
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -31,9 +32,10 @@ app.get('/api', (req, res) => {
 });
 
 // Routes
-//app.use('/api/menu', require('./routes/menuRoutes'));
-//app.use('/api/orders', require('./routes/orderRoutes'));
-//app.use('/api/users', require('./routes/userRoutes'));
+// ✨ These are now active! ✨
+app.use('/api/menu', require('./routes/menuRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

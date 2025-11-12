@@ -18,16 +18,40 @@ export default function MenuPage() {
     api.get(url).then((r) => setItems(r.data));
   }, [active]);
 
+  // Helper function for styling the category buttons
+  const getButtonClass = (categoryId) => {
+    const baseClass = 'px-4 py-2 rounded-full font-medium text-sm transition-colors duration-200';
+    if (active === categoryId) {
+      return `${baseClass} bg-emerald-600 text-white border border-emerald-600`;
+    }
+    return `${baseClass} bg-white border border-gray-300 text-gray-700 hover:bg-gray-100`;
+  };
+
   return (
     <div className="py-8">
-      <h1 className="text-2xl font-semibold mb-4">Menu</h1>
-      <div className="flex gap-2 mb-6 flex-wrap">
-        <button onClick={() => setActive('')} className={`px-3 py-1 rounded border ${active===''?'bg-emerald-600 text-white':''}`}>Semua</button>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Our Menu</h1>
+      
+      {/* Category Filters */}
+      <div className="flex gap-3 mb-8 flex-wrap">
+        <button
+          onClick={() => setActive('')}
+          className={getButtonClass('')}
+        >
+          All
+        </button>
         {categories.map((c) => (
-          <button key={c.category_id} onClick={() => setActive(c.category_id)} className={`px-3 py-1 rounded border ${active===c.category_id?'bg-emerald-600 text-white':''}`}>{c.category_name}</button>
+          <button 
+            key={c.category_id} 
+            onClick={() => setActive(c.category_id)}
+            className={getButtonClass(c.category_id)}
+          >
+            {c.category_name}
+          </button>
         ))}
       </div>
-      <div className="grid md:grid-cols-3 gap-4">
+      
+      {/* Menu Item Grid */}
+      <div className="grid md:grid-cols-3 gap-6">
         {items.map((item) => (
           <MenuItem key={item.menu_id} item={item} onAdd={addItem} />
         ))}

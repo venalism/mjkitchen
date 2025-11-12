@@ -1,7 +1,8 @@
 // client/src/services/api.js
 import axios from 'axios';
-import { supabase } from './supabase'; // Import your new supabase client
+import { supabase } from './supabase';
 
+// Create base Axios instance
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
@@ -9,34 +10,53 @@ const api = axios.create({
   },
 });
 
-// Request interceptor - add Supabase token to requests
+// --- Request interceptor: attach Supabase token ---
+let cachedToken = null;  // Cache to reduce redundant getSession() calls
+let tokenExpiry = 0;
+
 api.interceptors.request.use(
   async (config) => {
-    // Get the current session from Supabase
-    const { data: { session } } = await supabase.auth.getSession();
+    const now = Date.now();
 
-    if (session?.access_token) {
-      config.headers.Authorization = `Bearer ${session.access_token}`;
+    // Refresh cached token if expired or missing
+    if (!cachedToken || now > tokenExpiry) {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session?.access_token) {
+        cachedToken = session.access_token;
+        tokenExpiry = (session.expires_at || 0) * 1000;
+      } else {
+        cachedToken = null;
+        tokenExpiry = 0;
+      }
     }
+
+    // Attach token if available
+    if (cachedToken) {
+      config.headers.Authorization = `Bearer ${cachedToken}`;
+    }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor - handle errors
+// --- Response interceptor: handle 401 errors globally ---
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // A 401 from our *own* server is a critical error.
-      // Supabase's client handles its own 401s for token refreshing.
-      console.error('Unauthorized request to custom API');
-      // You could redirect to login here, but Supabase auth state
-      // might still be valid.
+    const status = error.response?.status;
+
+    if (status === 401) {
+      console.warn('Unauthorized request to backend API.');
+      // Optional: clear cache to force token refresh next request
+      cachedToken = null;
+      tokenExpiry = 0;
+
+      // You could also dispatch a logout or redirect:
       // window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

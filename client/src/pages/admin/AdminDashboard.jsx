@@ -5,12 +5,17 @@ export default function AdminDashboard() {
   const [summary, setSummary] = useState({ orders: 0, revenue: 0 });
 
   useEffect(() => {
-    // Simple summary from orders table
-    (async () => {
-      const { data } = await api.get('/orders');
-      const revenue = data.reduce((s, o) => s + Number(o.total_amount), 0);
-      setSummary({ orders: data.length, revenue });
-    })();
+    const fetchSummary = async () => {
+      try {
+        const { data } = await api.get('/admin/orders');
+        const revenue = data.reduce((sum, o) => sum + Number(o.total_amount), 0);
+        setSummary({ orders: data.length, revenue });
+      } catch (err) {
+        console.error('Failed to load admin dashboard:', err);
+      }
+    };
+
+    fetchSummary();
   }, []);
 
   return (
@@ -23,10 +28,11 @@ export default function AdminDashboard() {
         </div>
         <div className="bg-white border rounded p-4">
           <div className="text-gray-500 text-sm">Total Revenue</div>
-          <div className="text-3xl font-bold">Rp {summary.revenue.toLocaleString()}</div>
+          <div className="text-3xl font-bold">
+            Rp {summary.revenue.toLocaleString()}
+          </div>
         </div>
       </div>
     </div>
   );
 }
-

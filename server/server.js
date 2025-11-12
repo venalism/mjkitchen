@@ -31,7 +31,6 @@ app.get('/api', (req, res) => {
 });
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes')); // optional legacy auth
 app.use('/api/menu', require('./routes/menuRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));

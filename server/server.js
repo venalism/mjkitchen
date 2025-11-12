@@ -30,11 +30,11 @@ app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to MJ Kitchen API' });
 });
 
-// Import routes (we'll create these later)
-// app.use('/api/auth', require('./routes/authRoutes'));
-// app.use('/api/menu', require('./routes/menuRoutes'));
-// app.use('/api/orders', require('./routes/orderRoutes'));
-// app.use('/api/users', require('./routes/userRoutes'));
+// Routes
+app.use('/api/auth', require('./routes/authRoutes')); // optional legacy auth
+app.use('/api/menu', require('./routes/menuRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

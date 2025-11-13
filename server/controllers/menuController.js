@@ -139,3 +139,53 @@ exports.deleteMenu = async (req, res) => {
     res.status(500).json({ message: 'Gagal menghapus item menu' });
   }
 };
+
+// Gallery
+exports.addGalleryImage = async (req, res) => {
+  try {
+    const { menu_id } = req.params;
+    const { image_url, caption } = req.body;
+
+    if (!image_url) {
+      return res.status(400).json({ message: 'Image URL is required' });
+    }
+
+    const { rows } = await pool.query(
+      'INSERT INTO "gallery"(menu_id, image_url, caption) VALUES ($1, $2, $3) RETURNING *',
+      [menu_id, image_url, caption || null]
+    );
+    res.status(201).json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ message: 'Gagal menambah gambar', detail: e.message });
+  }
+};
+
+exports.updateGalleryImage = async (req, res) => {
+  try {
+    const { gallery_id } = req.params;
+    const { image_url, caption } = req.body;
+
+    if (!image_url) {
+      return res.status(400).json({ message: 'Image URL is required' });
+    }
+
+    const { rows } = await pool.query(
+      'UPDATE "gallery" SET image_url=$1, caption=$2 WHERE gallery_id=$3 RETURNING *',
+      [image_url, caption || null, gallery_id]
+    );
+    if (!rows[0]) return res.status(404).json({ message: 'Gambar tidak ditemukan' });
+    res.json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ message: 'Gagal memperbarui gambar', detail: e.message });
+  }
+};
+
+exports.deleteGalleryImage = async (req, res) => {
+  try {
+    const { gallery_id } = req.params;
+    await pool.query('DELETE FROM "gallery" WHERE gallery_id=$1', [gallery_id]);
+    res.json({ success: true, message: 'Gambar berhasil dihapus' });
+  } catch (e) {
+    res.status(500).json({ message: 'Gagal menghapus gambar', detail: e.message });
+  }
+};

@@ -16,6 +16,7 @@ import AdminProfilePage from './pages/admin/AdminProfilePage';
 import AdminAddressPage from './pages/admin/AdminAddressPage'; 
 import ProfilePage from './pages/ProfilePage';
 import AdminCategoryPage from './pages/admin/AdminCategoryPage';
+import AdminGalleryPage from './pages/admin/AdminGalleryPage';
 
 // Private Route
 const PrivateRoute = ({ children }) => {
@@ -76,6 +77,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="menu" element={<AdminMenuPage />} />
           <Route path="categories" element={<AdminCategoryPage />} />
+          <Route path="menu/:menuId/gallery" element={<AdminGalleryPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="profiles" element={<AdminProfilePage />} />
           <Route path="profiles/:userId/addresses" element={<AdminAddressPage />} />

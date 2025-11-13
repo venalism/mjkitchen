@@ -21,4 +21,8 @@ router.post('/categories', [auth, adminOnly], menuController.createCategory);
 router.put('/categories/:id', [auth, adminOnly], menuController.updateCategory);
 router.delete('/categories/:id', [auth, adminOnly], menuController.deleteCategory);
 
+router.post('/:menu_id/gallery', [auth, adminOnly], menuController.addGalleryImage);
+router.put('/gallery/:gallery_id', [auth, adminOnly], menuController.updateGalleryImage);
+router.delete('/gallery/:gallery_id', [auth, adminOnly], menuController.deleteGalleryImage);
+
 module.exports = router;

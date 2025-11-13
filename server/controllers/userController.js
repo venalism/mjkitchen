@@ -1,6 +1,8 @@
 // server/controllers/userController.js
 const pool = require('../config/db');
 
+// --- EXISTING USER-FACING FUNCTIONS ---
+
 exports.getMe = async (req, res) => {
   try {
     res.json(req.profile);
@@ -24,7 +26,8 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Addresses CRUD
+// ... (keep existing address functions: listAddresses, createAddress, etc.) ...
+// --- Addresses CRUD ---
 exports.listAddresses = async (req, res) => {
   try {
     const { user_id } = req.params; // This will be the profile.id from the client
@@ -77,5 +80,55 @@ exports.deleteAddress = async (req, res) => {
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ message: 'Gagal menghapus alamat' });
+  }
+};
+
+
+// --- ✨ NEW ADMIN-ONLY FUNCTIONS ---
+
+exports.getAllProfiles = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT id, role, name, phone_number, created_at FROM "profile" ORDER BY created_at DESC'
+    );
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ message: 'Gagal memuat daftar profil' });
+  }
+};
+
+exports.updateProfileById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, phone_number, role } = req.body;
+
+    // Validate role
+    if (!['admin', 'customer'].includes(role)) {
+      return res.status(400).json({ message: 'Role tidak valid.' });
+    }
+
+    const { rows } = await pool.query(
+      'UPDATE "profile" SET name=$1, phone_number=$2, role=$3, updated_at=NOW() WHERE id=$4 RETURNING id, role, name, phone_number',
+      [name, phone_number || null, role, id]
+    );
+    if (!rows[0]) return res.status(404).json({ message: 'Profil tidak ditemukan' });
+    res.json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ message: 'Gagal memperbarui profil' });
+  }
+};
+
+exports.deleteProfileById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // We only delete from 'profile'. The ON DELETE CASCADE will handle auth.users.
+    const result = await pool.query('DELETE FROM "profile" WHERE id=$1', [id]);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Profil tidak ditemukan' });
+    }
+    res.json({ success: true, message: 'Profil berhasil dihapus' });
+  } catch (e) {
+    res.status(500).json({ message: 'Gagal menghapus profil', detail: e.message });
   }
 };

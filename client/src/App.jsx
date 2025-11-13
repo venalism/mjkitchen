@@ -12,14 +12,16 @@ import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 import { useAuthStore } from './store/authStore';
+import AdminProfilePage from './pages/admin/AdminProfilePage'; 
 
+// Private Route
 const PrivateRoute = ({ children }) => {
   const token = useAuthStore((s) => s.token);
   if (!token) return <Navigate to="/login" replace />;
   return children;
 };
 
-//  NEW ADMIN ROUTE COMPONENT
+// Admin Route
 const AdminRoute = ({ children }) => {
   const token = useAuthStore((s) => s.token);
   const profile = useAuthStore((s) => s.profile);
@@ -66,11 +68,11 @@ function App() {
           <Route path="/orders" element={<PrivateRoute><OrderTrackingPage /></PrivateRoute>} />
         </Route>
 
-        {/* ✨ UPDATED: Use AdminRoute to protect this whole section */}
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="menu" element={<AdminMenuPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="profiles" element={<AdminProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

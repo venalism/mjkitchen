@@ -7,7 +7,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const { data } = await api.get('/admin/orders');
+        const { data } = await api.get('/orders');
         const revenue = data.reduce((sum, o) => sum + Number(o.total_amount), 0);
         setSummary({ orders: data.length, revenue });
       } catch (err) {

@@ -8,15 +8,15 @@ const adminOnly = require('../middleware/adminOnly'); // ✨ Import adminOnly
 // Protect all routes
 router.use(auth);
 
-// --- ✨ NEW ADMIN ROUTES ---
-// Must come before '/me' and other dynamic routes
-router.get('/', [adminOnly], userController.getAllProfiles);
-router.put('/:id', [adminOnly], userController.updateProfileById);
-router.delete('/:id', [adminOnly], userController.deleteProfileById);
-
 // --- Profile routes ---
 router.get('/me', userController.getMe);
 router.put('/me', userController.updateProfile);
+router.delete('/me', userController.deleteMe);
+
+// --- Admin-only profile management routes ---
+router.get('/', [adminOnly], userController.getAllProfiles);
+router.put('/:id', [adminOnly], userController.updateProfileById);
+router.delete('/:id', [adminOnly], userController.deleteProfileById);
 
 // --- Address routes ---
 router.get('/:user_id/addresses', userController.listAddresses);

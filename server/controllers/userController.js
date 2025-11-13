@@ -26,7 +26,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// ... (keep existing address functions: listAddresses, createAddress, etc.) ...
+
 // --- Addresses CRUD ---
 exports.listAddresses = async (req, res) => {
   try {
@@ -40,14 +40,14 @@ exports.listAddresses = async (req, res) => {
 
 exports.createAddress = async (req, res) => {
   try {
-    const { user_id } = req.params; // This will be the profile.id
-    const { label, street, postal_code, is_default, city } = req.body; // Added city from your SQL
+    const { user_id } = req.params; 
+    const { label, street, postal_code, is_default, city } = req.body; 
     if (is_default) {
       await pool.query('UPDATE "user_address" SET is_default=false WHERE user_id=$1', [user_id]);
     }
     const { rows } = await pool.query(
       'INSERT INTO "user_address"(user_id, label, street, postal_code, is_default, city) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
-      [user_id, label, street, postal_code, !!is_default, city]
+      [user_id, label, street, postal_code, !!is_default, city] 
     );
     res.status(201).json(rows[0]);
   } catch (e) {
@@ -58,7 +58,8 @@ exports.createAddress = async (req, res) => {
 exports.updateAddress = async (req, res) => {
   try {
     const { user_id, address_id } = req.params;
-    const { label, street, postal_code, is_default, city } = req.body; // Added city
+    // ✨ ADD city HERE
+    const { label, street, postal_code, is_default, city } = req.body; 
     if (is_default) {
       await pool.query('UPDATE "user_address" SET is_default=false WHERE user_id=$1', [user_id]);
     }
@@ -84,7 +85,7 @@ exports.deleteAddress = async (req, res) => {
 };
 
 
-// --- ✨ NEW ADMIN-ONLY FUNCTIONS ---
+// --- NEW ADMIN-ONLY FUNCTIONS ---
 
 exports.getAllProfiles = async (req, res) => {
   try {
@@ -130,5 +131,23 @@ exports.deleteProfileById = async (req, res) => {
     res.json({ success: true, message: 'Profil berhasil dihapus' });
   } catch (e) {
     res.status(500).json({ message: 'Gagal menghapus profil', detail: e.message });
+  }
+};
+
+// USER DUNCTION TO DELETE OWN PROFILE
+
+exports.deleteMe = async (req, res) => {
+  try {
+    const { id } = req.profile; // from auth middleware
+    
+    // This will cascade and delete the user from auth.users thanks to your SQL schema
+    const result = await pool.query('DELETE FROM "profile" WHERE id=$1', [id]);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Profil tidak ditemukan' });
+    }
+    res.json({ success: true, message: 'Akun berhasil dihapus' });
+  } catch (e) {
+    res.status(500).json({ message: 'Gagal menghapus akun', detail: e.message });
   }
 };

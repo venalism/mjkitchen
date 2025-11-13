@@ -17,8 +17,6 @@ export const useAuthStore = create((set, get) => ({
       if (session?.access_token) {
         set({ user: session.user, token: session.access_token });
         localStorage.setItem('token', session.access_token);
-        
-        // ✨ UPDATED: Fetch the profile instead of bootstrapping
         const resp = await api.get('/users/me');
         set({ profile: resp.data });
         
@@ -37,8 +35,6 @@ export const useAuthStore = create((set, get) => ({
       set({ user: session?.user || null, token });
       if (token) {
         localStorage.setItem('token', token);
-        
-        // ✨ UPDATED: Fetch the profile instead of bootstrapping
         const resp = await api.get('/users/me');
         set({ profile: resp.data });
 
@@ -53,6 +49,12 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  setProfile: (newProfileData) => {
+    set((state) => ({
+      profile: state.profile ? { ...state.profile, ...newProfileData } : newProfileData,
+    }));
+  },
+  
   logout: async () => {
     await signOut();
     localStorage.removeItem('token');

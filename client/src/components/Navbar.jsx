@@ -35,6 +35,9 @@ export default function Navbar() {
               <NavLink to="/orders" className={navLinkClass}>
                 My Orders
               </NavLink>
+              <NavLink to="/profile" className={navLinkClass}>
+                My Profile
+              </NavLink>
               <button
                 onClick={logout}
                 className="ml-2 text-gray-600 hover:text-red-500 transition-colors duration-200"

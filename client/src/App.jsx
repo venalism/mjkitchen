@@ -13,6 +13,7 @@ import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 import { useAuthStore } from './store/authStore';
 import AdminProfilePage from './pages/admin/AdminProfilePage'; 
+import ProfilePage from './pages/ProfilePage';
 
 // Private Route
 const PrivateRoute = ({ children }) => {
@@ -66,6 +67,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/orders" element={<PrivateRoute><OrderTrackingPage /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
         </Route>
 
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

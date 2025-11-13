@@ -1,11 +1,12 @@
-// client/src/components/AddressManager.jsx
+// client/src/pages/admin/AdminAddressPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import api from '../services/api';
-import { useAuthStore } from '../store/authStore';
-import { FiMapPin, FiPlus, FiEdit, FiTrash2, FiX, FiHome } from 'react-icons/fi';
+import { useParams, Link } from 'react-router-dom';
+import api from '../../services/api';
+import { FiMapPin, FiPlus, FiEdit, FiTrash2, FiX, FiHome, FiArrowLeft } from 'react-icons/fi';
 
-// This is the modal component, defined in the same file for simplicity
+// NOTE: This is the same modal from AddressManager.jsx
+// For larger apps, you might move this to a shared component.
 const AddressModal = ({ address, onClose, onSave }) => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: address || {
@@ -98,18 +99,21 @@ const AddressModal = ({ address, onClose, onSave }) => {
 };
 
 
-// This is the main AddressManager component
-export default function AddressManager() {
-  const profile = useAuthStore((s) => s.profile);
+// This is the main AdminAddressPage
+export default function AdminAddressPage() {
+  const { userId } = useParams(); // Get the user ID from the URL
   const [addresses, setAddresses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
+  const [userName, setUserName] = useState('');
 
   const loadAddresses = async () => {
-    if (profile?.id) {
+    if (userId) {
       try {
-        const { data } = await api.get(`/users/me/addresses`);
+        // We can't get the user name from this endpoint, so we'll just load addresses
+        const { data } = await api.get(`/users/admin/${userId}/addresses`);
         setAddresses(data);
+        // A full app might fetch the user's name separately, but we'll skip for simplicity
       } catch (error) {
         console.error('Failed to load addresses:', error);
       }
@@ -118,7 +122,9 @@ export default function AddressManager() {
 
   useEffect(() => {
     loadAddresses();
-  }, [profile]);
+    // We could fetch the user's name here:
+    // api.get(`/users`).then(r => setUserName(r.data.find(u => u.id === userId)?.name))
+  }, [userId]);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -128,9 +134,11 @@ export default function AddressManager() {
   const handleModalSave = async (data) => {
     try {
       if (editingAddress) {
-        await api.put(`/users/me/addresses/${editingAddress.address_id}`, data);
+        // Use admin route
+        await api.put(`/users/admin/${userId}/addresses/${editingAddress.address_id}`, data);
       } else {
-        await api.post(`/users/me/addresses`, data);
+        // Use admin route
+        await api.post(`/users/admin/${userId}/addresses`, data);
       }
       handleModalClose();
       loadAddresses(); // Refresh the list
@@ -143,7 +151,8 @@ export default function AddressManager() {
   const handleDelete = async (addressId) => {
     if (window.confirm('Are you sure you want to delete this address?')) {
       try {
-        await api.delete(`/users/me/addresses/${addressId}`);
+        // Use admin route
+        await api.delete(`/users/admin/${userId}/addresses/${addressId}`);
         loadAddresses(); // Refresh
       } catch (error) {
         console.error('Failed to delete address:', error);
@@ -152,64 +161,78 @@ export default function AddressManager() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-3">
-          <FiMapPin className="text-emerald-600" size={20} />
-          <h2 className="text-lg font-semibold text-gray-800">My Addresses</h2>
-        </div>
-        <button
-          onClick={() => {
-            setEditingAddress(null);
-            setIsModalOpen(true);
-          }}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-md text-sm font-medium hover:bg-emerald-700"
+    <div className="py-6">
+      <div className="mb-4">
+        <Link 
+          to="/admin/profiles" 
+          className="flex items-center gap-2 text-sm text-emerald-600 hover:text-emerald-800"
         >
-          <FiPlus size={16} />
-          Add New
-        </button>
+          <FiArrowLeft />
+          Back to Profiles
+        </Link>
       </div>
+      
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-3">
+            <FiMapPin className="text-emerald-600" size={20} />
+            <h2 className="text-lg font-semibold text-gray-800">
+              Manage Addresses (User: {userId.substring(0, 8)}...)
+            </h2>
+          </div>
+          <button
+            onClick={() => {
+              setEditingAddress(null);
+              setIsModalOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-md text-sm font-medium hover:bg-emerald-700"
+          >
+            <FiPlus size={16} />
+            Add New
+          </button>
+        </div>
 
-      <div className="p-6">
-        {addresses.length === 0 ? (
-          <p className="text-gray-500 text-sm">You haven't added any addresses yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {addresses.map((addr) => (
-              <div key={addr.address_id} className="border-b pb-3 last:border-b-0 last:pb-0">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="font-semibold text-gray-800">{addr.label}</span>
-                    {addr.is_default && (
-                      <span className="ml-2 inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                        <FiHome size={12} /> Default
-                      </span>
-                    )}
-                    <p className="text-sm text-gray-600">{addr.street}</p>
-                    <p className="text-sm text-gray-600">{addr.city}, {addr.postal_code}</p>
-                  </div>
-                  <div className="flex gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => {
-                        setEditingAddress(addr);
-                        setIsModalOpen(true);
-                      }}
-                      className="text-gray-500 hover:text-emerald-600"
-                    >
-                      <FiEdit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(addr.address_id)}
-                      className="text-gray-500 hover:text-red-600"
-                    >
-                      <FiTrash2 size={16} />
-                    </button>
+        <div className="p-6">
+          {addresses.length === 0 ? (
+            <p className="text-gray-500 text-sm">This user has no addresses.</p>
+          ) : (
+            <div className="space-y-3">
+              {addresses.map((addr) => (
+                <div key={addr.address_id} className="border-b pb-3 last:border-b-0 last:pb-0">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="font-semibold text-gray-800">{addr.label}</span>
+                      {addr.is_default && (
+                        <span className="ml-2 inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                          <FiHome size={12} /> Default
+                        </span>
+                      )}
+                      <p className="text-sm text-gray-600">{addr.street}</p>
+                      <p className="text-sm text-gray-600">{addr.city}, {addr.postal_code}</p>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => {
+                          setEditingAddress(addr);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-gray-500 hover:text-emerald-600"
+                      >
+                        <FiEdit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(addr.address_id)}
+                        className="text-gray-500 hover:text-red-600"
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {isModalOpen && (

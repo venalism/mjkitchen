@@ -30,7 +30,8 @@ exports.updateProfile = async (req, res) => {
 // --- Addresses CRUD ---
 exports.listAddresses = async (req, res) => {
   try {
-    const { user_id } = req.params; // This will be the profile.id from the client
+    const user_id = req.params.user_id || req.profile.id;
+    
     const { rows } = await pool.query('SELECT * FROM "user_address" WHERE user_id=$1 ORDER BY is_default DESC, address_id DESC', [user_id]);
     res.json(rows);
   } catch (e) {
@@ -40,14 +41,15 @@ exports.listAddresses = async (req, res) => {
 
 exports.createAddress = async (req, res) => {
   try {
-    const { user_id } = req.params; 
-    const { label, street, postal_code, is_default, city } = req.body; 
+    const user_id = req.params.user_id || req.profile.id;
+    const { label, street, postal_code, is_default, city } = req.body;
+    
     if (is_default) {
       await pool.query('UPDATE "user_address" SET is_default=false WHERE user_id=$1', [user_id]);
     }
     const { rows } = await pool.query(
       'INSERT INTO "user_address"(user_id, label, street, postal_code, is_default, city) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
-      [user_id, label, street, postal_code, !!is_default, city] 
+      [user_id, label, street, postal_code, !!is_default, city]
     );
     res.status(201).json(rows[0]);
   } catch (e) {
@@ -57,9 +59,10 @@ exports.createAddress = async (req, res) => {
 
 exports.updateAddress = async (req, res) => {
   try {
-    const { user_id, address_id } = req.params;
-    // ✨ ADD city HERE
-    const { label, street, postal_code, is_default, city } = req.body; 
+    const user_id = req.params.user_id || req.profile.id;
+    const { address_id } = req.params; // address_id always from params
+    const { label, street, postal_code, is_default, city } = req.body;
+    
     if (is_default) {
       await pool.query('UPDATE "user_address" SET is_default=false WHERE user_id=$1', [user_id]);
     }
@@ -76,14 +79,15 @@ exports.updateAddress = async (req, res) => {
 
 exports.deleteAddress = async (req, res) => {
   try {
-    const { user_id, address_id } = req.params;
+    const user_id = req.params.user_id || req.profile.id;
+    const { address_id } = req.params;
+    
     await pool.query('DELETE FROM "user_address" WHERE address_id=$1 AND user_id=$2', [address_id, user_id]);
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ message: 'Gagal menghapus alamat' });
   }
 };
-
 
 // --- NEW ADMIN-ONLY FUNCTIONS ---
 

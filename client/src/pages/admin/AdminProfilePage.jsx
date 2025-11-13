@@ -1,8 +1,9 @@
 // client/src/pages/admin/AdminProfilePage.jsx
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { format } from 'date-fns';
-import { FiEdit, FiTrash2, FiX } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiX, FiMapPin } from 'react-icons/fi';
 
 export default function AdminProfilePage() {
   const [profiles, setProfiles] = useState([]);
@@ -103,6 +104,15 @@ export default function AdminProfilePage() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.phone_number || '-'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {format(new Date(p.created_at), 'dd MMM yyyy')}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Link
+                    to={`/admin/profiles/${p.id}/addresses`}
+                    className="text-blue-600 hover:text-blue-900 inline-block"
+                    title="Manage Addresses"
+                  >
+                    <FiMapPin />
+                  </Link>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                   <button onClick={() => handleEditClick(p)} className="text-emerald-600 hover:text-emerald-900">

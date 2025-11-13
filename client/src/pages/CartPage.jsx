@@ -13,7 +13,7 @@ export default function CartPage() {
   const placeOrder = async () => {
     if (!profile) return alert('Harap login');
     
-    const addrs = await api.get(`/users/${profile.id}/addresses`);
+    const addrs = await api.get('/users/me/addresses');
     const defaultAddress = addrs.data[0];
     
     if (!defaultAddress) {

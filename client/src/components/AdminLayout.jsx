@@ -7,7 +7,8 @@ import {
   FiShoppingCart, 
   FiChevronsLeft, 
   FiChevronsRight,
-  FiUsers
+  FiUsers,
+  FiTag
 } from 'react-icons/fi';
 
 /**
@@ -71,6 +72,12 @@ export default function AdminLayout() {
             to="/admin/menu" 
             icon={FiClipboard} 
             label="Menu" 
+            isExpanded={isExpanded} 
+          />
+          <AdminNavLink 
+            to="/admin/categories" 
+            icon={FiTag} 
+            label="Categories" 
             isExpanded={isExpanded} 
           />
           <AdminNavLink 

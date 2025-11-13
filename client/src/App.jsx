@@ -15,6 +15,7 @@ import { useAuthStore } from './store/authStore';
 import AdminProfilePage from './pages/admin/AdminProfilePage';
 import AdminAddressPage from './pages/admin/AdminAddressPage'; 
 import ProfilePage from './pages/ProfilePage';
+import AdminCategoryPage from './pages/admin/AdminCategoryPage';
 
 // Private Route
 const PrivateRoute = ({ children }) => {
@@ -74,6 +75,7 @@ function App() {
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="menu" element={<AdminMenuPage />} />
+          <Route path="categories" element={<AdminCategoryPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="profiles" element={<AdminProfilePage />} />
           <Route path="profiles/:userId/addresses" element={<AdminAddressPage />} />

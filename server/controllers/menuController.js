@@ -4,7 +4,7 @@ const pool = require('../config/db');
 // Categories
 exports.getCategories = async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT category_id, category_name, description FROM "category" ORDER BY category_name ASC');
+    const { rows } = await pool.query('SELECT category_id, category_name, description, image_url FROM "category" ORDER BY category_name ASC');
     res.json(rows);
   } catch (e) {
     res.status(500).json({ message: 'Gagal memuat kategori' });
@@ -13,10 +13,10 @@ exports.getCategories = async (req, res) => {
 
 exports.createCategory = async (req, res) => {
   try {
-    const { category_name, description } = req.body;
+    const { category_name, description, image_url } = req.body;
     const { rows } = await pool.query(
-      'INSERT INTO "category"(category_name, description) VALUES ($1, $2) RETURNING category_id, category_name, description',
-      [category_name, description || null]
+      'INSERT INTO "category"(category_name, description, image_url) VALUES ($1, $2, $3) RETURNING *',
+      [category_name, description || null, image_url || null]
     );
     res.status(201).json(rows[0]);
   } catch (e) {
@@ -27,10 +27,10 @@ exports.createCategory = async (req, res) => {
 exports.updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { category_name, description } = req.body;
+    const { category_name, description, image_url } = req.body;
     const { rows } = await pool.query(
-      'UPDATE "category" SET category_name=$1, description=$2 WHERE category_id=$3 RETURNING category_id, category_name, description',
-      [category_name, description || null, id]
+      'UPDATE "category" SET category_name=$1, description=$2, image_url=$3 WHERE category_id=$4 RETURNING *',
+      [category_name, description || null, image_url || null, id]
     );
     if (!rows[0]) return res.status(404).json({ message: 'Kategori tidak ditemukan' });
     res.json(rows[0]);

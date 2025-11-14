@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiAlertCircle, FiLogIn } from 'react-icons/fi';
-// import { FaGoogle } from 'react-icons/fa'; // Not using Google for now
+import { FaGoogle } from 'react-icons/fa';
 import { supabase } from '../services/supabase';
 
 function LoginPage() {
@@ -33,18 +33,15 @@ function LoginPage() {
     }
   };
 
-  /* // Commenting out Google login since it's not configured
   const handleGoogleLogin = async () => {
-    setLoading(true);
-    setAuthError(null);
     try {
-      await signInWithGoogle();
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
     } catch (error) {
-      setAuthError(error.message);
-      setLoading(false);
+      alert(error.message);
     }
   };
-  */
 
   return (
     <div className="flex items-center justify-center py-12">
@@ -58,6 +55,14 @@ function LoginPage() {
             <span>{authError}</span>
           </div>
         )}
+
+        <button
+          onClick={handleGoogleLogin}
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 shadow-sm"
+        >
+          <FaGoogle size={20} />
+          Sign in with Google
+        </button>
 
         {/* Separator */}
         <div className="relative">

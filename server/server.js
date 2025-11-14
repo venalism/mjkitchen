@@ -32,7 +32,6 @@ app.get('/api', (req, res) => {
 });
 
 // Routes
-// ✨ These are now active! ✨
 app.use('/api/menu', require('./routes/menuRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));

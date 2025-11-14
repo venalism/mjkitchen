@@ -128,7 +128,7 @@ export default function AdminProfilePage() {
 
       {/* Edit Modal */}
       {isModalOpen && currentProfile && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-60 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
             {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b">

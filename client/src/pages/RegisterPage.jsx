@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiAlertCircle, FiUserPlus } from 'react-icons/fi';
-// import { FaGoogle } from 'react-icons/fa'; // Not using Google for now
+import { FaGoogle } from 'react-icons/fa';
 import { supabase } from '../services/supabase';
 
 function RegisterPage() {
